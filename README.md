@@ -1,6 +1,4 @@
-Aquí tienes el `README.md` completo en inglés, redactado con rigor técnico, justificación de arquitectura y explicaciones estadísticas para que destaque como un proyecto de observabilidad de nivel profesional en GitHub:
 
-```markdown
 # Linux RAM & Process Monitor
 
 A lightweight, on-demand observability stack engineered to monitor, persist, and statistically analyze system memory (RAM/Swap) and per-process memory consumption on Linux.
@@ -372,6 +370,8 @@ make check
 *Expected output: Two `"health":"up"` confirmations followed by `Targets OK`.*
 
 ### 3. Access Dashboard
+```
+
 
 Navigate to `http://127.0.0.1:3000` in your browser:
 
@@ -420,6 +420,7 @@ alias ram-ui="xdg-open [http://127.0.0.1:3000](http://127.0.0.1:3000)"
 Distributed under the MIT License. Feel free to fork, adapt, and use it for personal monitoring or infrastructure benchmarking.
 EOF
 
-```
+
+
 
 ```

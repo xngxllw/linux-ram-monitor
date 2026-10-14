@@ -1,0 +1,119 @@
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: ram-node-exporter
+    network_mode: host
+    pid: host
+    command:
+      - --path.rootfs=/host
+      - --web.listen-address=127.0.0.1:9100
+      - --collector.disable-defaults
+      - --collector.meminfo
+      - --collector.vmstat
+    volumes:
+      - /:/host:ro,rslave
+    security_opt:
+      - label=disable
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: ram-node-exporter
+    network_mode: host
+    pid: host
+    command:
+      - --path.rootfs=/host
+      - --web.listen-address=127.0.0.1:9100
+      - --collector.disable-defaults
+      - --collector.meminfo
+      - --collector.vmstat
+    volumes:
+      - /:/host:ro,rslave
+    security_opt:
+      - label=disable
+
+  process-exporter:
+    image: docker.io/ncabatoff/process-exporter:latest
+    container_name: ram-process-exporter
+    network_mode: host
+    pid: host
+    command:
+      - --procfs=/host/proc
+      - --config.path=/etc/process-exporter.yml
+      - --web.listen-address=127.0.0.1:9256
+      - --gather-smaps=false
+    volumes:
+      - /proc:/host/proc:ro
+      - ./process-exporter.yml:/etc/process-exporter.yml:ro,Z
+    security_opt:
+      - label=disable
+
+  victoria:
+    image: docker.io/victoriametrics/victoria-metrics:v1.115.0
+    container_name: ram-victoria
+    network_mode: host
+    command:
+      - -storageDataPath=/storage
+      - -retentionPeriod=12
+      - -promscrape.config=/etc/scrape.yml
+      - -httpListenAddr=127.0.0.1:8428
+    volumes:
+      - vmdata:/storage
+      - ./scrape.yml:/etc/scrape.yml:ro,Z
+
+  grafana:
+    image: docker.io/grafana/grafana-oss:11.5.2
+    container_name: ram-grafana
+    network_mode: host
+    environment:
+      - GF_SERVER_HTTP_ADDR=127.0.0.1
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafdata:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning:ro,Z
+
+volumes:
+  vmdata:
+  grafdata:
+  process-exporter:
+    image: docker.io/ncabatoff/process-exporter:latest
+    container_name: ram-process-exporter
+    network_mode: host
+    pid: host
+    command:
+      - --procfs=/host/proc
+      - --config.path=/etc/process-exporter.yml
+      - --web.listen-address=127.0.0.1:9256
+      - --gather-smaps=false
+    volumes:
+      - /proc:/host/proc:ro
+      - ./process-exporter.yml:/etc/process-exporter.yml:ro,Z
+    security_opt:
+      - label=disable
+
+  victoria:
+    image: docker.io/victoriametrics/victoria-metrics:v1.115.0
+    container_name: ram-victoria
+    network_mode: host
+    command:
+      - -storageDataPath=/storage
+      - -retentionPeriod=12
+      - -promscrape.config=/etc/scrape.yml
+      - -httpListenAddr=127.0.0.1:8428
+    volumes:
+      - vmdata:/storage
+      - ./scrape.yml:/etc/scrape.yml:ro,Z
+
+  grafana:
+    image: docker.io/grafana/grafana-oss:11.5.2
+    container_name: ram-grafana
+    network_mode: host
+    environment:
+      - GF_SERVER_HTTP_ADDR=127.0.0.1
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafdata:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning:ro,Z
+
+volumes:
+  vmdata:
+  grafdata:

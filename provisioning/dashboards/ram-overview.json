@@ -1,0 +1,167 @@
+{"uid": "linux-ram-monitor",
+  "title": "Linux RAM & Process Monitor",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "title": "RAM Usada (%)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 85 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "RAM Usada Actual",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": { "unit": "gbytes", "decimals": 2 }
+      },
+      "targets": [
+        {
+          "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024^3",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Promedio (Rango)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": { "unit": "gbytes", "decimals": 2 }
+      },
+      "targets": [
+        {
+          "expr": "avg_over_time((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)[$__range]) / 1024^3",
+          "instant": true,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Pico Máximo (Rango)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": { "unit": "gbytes", "decimals": 2 }
+      },
+      "targets": [
+        {
+          "expr": "max_over_time((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)[$__range]) / 1024^3",
+          "instant": true,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Percentil 95 - P95",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": { "unit": "gbytes", "decimals": 2 }
+      },
+      "targets": [
+        {
+          "expr": "quantile_over_time(0.95, (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)[$__range]) / 1024^3",
+          "instant": true,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Desviación Estándar",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": { "unit": "gbytes", "decimals": 3 }
+      },
+      "targets": [
+        {
+          "expr": "stddev_over_time((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)[$__range]) / 1024^3",
+          "instant": true,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Evolución de Memoria RAM y Swap (GB)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": { "unit": "gbytes", " decimals": 2 }
+      },
+      "targets": [
+        {
+          "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024^3",
+          "legendFormat": "RAM Usada",
+          "refId": "A"
+        },
+        {
+          "expr": "(node_memory_Cached_bytes + node_memory_Buffers_bytes) / 1024^3",
+          "legendFormat": "Caché + Buffers (Kernel)",
+          "refId": "B"
+        },
+        {
+          "expr": "(node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes) / 1024^3",
+          "legendFormat": "Swap Usada",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Top 10 Procesos por Consumo de RAM (MB)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "victoriametrics" },
+      "fieldConfig": {
+        "defaults": { "unit": "mbytes", "decimals": 1 }
+      },
+      "targets": [
+        {
+          "expr": "topk(10, namedprocess_namegroup_memory_bytes{memtype=\"resident\"}) / 1024^2",
+          "legendFormat": "{{groupname}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
